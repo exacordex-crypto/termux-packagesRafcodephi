@@ -215,6 +215,9 @@ jobs:
         fi
         echo "needs-docker-build=$needs_docker_build" >> $GITHUB_OUTPUT
 
+    - name: Test package artifact collector
+      run: scripts/ci/collect-package-artifacts-test.sh
+
     - name: Lint packages
       run: |
         declare -a package_recipes=()
