@@ -25,6 +25,10 @@ printf 'other package\n' > output/foobar_1_aarch64.deb
 printf 'other package\n' > output/bar_1_aarch64.deb
 
 "$repo_root/scripts/ci/collect-package-artifacts.sh" aarch64 testsha
+mkdir -p debs-aarch64-testsha checksum-aarch64-testsha
+cp artifacts/debs-aarch64-testsha.tar artifacts/debs-aarch64-testsha.manifest debs-aarch64-testsha/
+cp checksum-aarch64-testsha.txt checksum-aarch64-testsha/
+"$repo_root/scripts/ci/validate-downloaded-package-artifacts.sh" testsha aarch64
 
 test -f artifacts/debs-aarch64-testsha.tar
 test -f checksum-aarch64-testsha.txt
@@ -43,6 +47,11 @@ if ! grep -qx "arch=aarch64" artifacts/debs-aarch64-testsha.manifest; then
 fi
 if ! grep -qx "deb_count=2" artifacts/debs-aarch64-testsha.manifest; then
 	printf "Missing deb_count manifest entry\n" >&2
+	exit 1
+fi
+
+if "$repo_root/scripts/ci/validate-downloaded-package-artifacts.sh" testsha sparc >/tmp/validate-invalid.out 2>/tmp/validate-invalid.err; then
+	printf "Expected invalid validation architecture to fail\n" >&2
 	exit 1
 fi
 
