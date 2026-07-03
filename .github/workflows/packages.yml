@@ -132,7 +132,7 @@ jobs:
                     echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
                   done
                 else
-                  echo "$pkg" >> ./deleted_${repo}_packages
+                  echo "$pkg" >> ./deleted_${repo}_packages.txt
                 fi
               fi
             done<<<${CHANGED_FILES}
@@ -294,34 +294,7 @@ jobs:
 
     - name: Generate build artifacts
       if: always()
-      run: |
-        test -d termux-packages/output && mv termux-packages/output/* ./output/
-
-        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
-          # Put package lists into directory with *.deb files so they will be transferred to
-          # upload job.
-          test -f ./built_${repo}_packages.txt && mv ./built_${repo}_packages.txt ./debs/
-          test -f ./built_${repo}_subpackages.txt && cat ./built_${repo}_subpackages.txt >> ./debs/built_${repo}_packages.txt \
-            && rm ./built_${repo}_subpackages.txt
-          test -f ./deleted_${repo}_packages.txt && mv ./deleted_${repo}_packages.txt ./debs/
-
-          # Move only debs from built_packages into debs/ folder before
-          # creating an archive.
-          if [ -f "./debs/built_${repo}_packages.txt" ] && [ -d "output" ]; then
-            while read -r pkg; do
-              # Match both $pkg.deb and $pkg-static.deb.
-              find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
-            done < <(cat "./debs/built_${repo}_packages.txt")
-          fi
-        done
-
-        # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
-        # Archiving *.deb files in a tarball to avoid issues with uploading.
-        tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs
-    - name: Checksums for built *.deb files
-      if: always()
-      run: |
-        find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
+      run: scripts/ci/collect-package-artifacts.sh "${{ matrix.target_arch }}" "${{ github.sha }}"
     - name: Store checksums for built *.deb files
       if: always()
       uses: actions/upload-artifact@v6
