@@ -1,0 +1,7 @@
+apt
+bash
+busybox
+proot
+dpkg
+coreutils
+termux-tools
