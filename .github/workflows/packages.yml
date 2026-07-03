@@ -132,7 +132,7 @@ jobs:
                     echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
                   done
                 else
-                  echo "$pkg" >> ./deleted_${repo}_packages
+                  echo "$pkg" >> ./deleted_${repo}_packages.txt
                 fi
               fi
             done<<<${CHANGED_FILES}
@@ -310,7 +310,7 @@ jobs:
           if [ -f "./debs/built_${repo}_packages.txt" ] && [ -d "output" ]; then
             while read -r pkg; do
               # Match both $pkg.deb and $pkg-static.deb.
-              find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
+              find output \( -name "${pkg}_*.deb" -o -name "${pkg}-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
             done < <(cat "./debs/built_${repo}_packages.txt")
           fi
         done
