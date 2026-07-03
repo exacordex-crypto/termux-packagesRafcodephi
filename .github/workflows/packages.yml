@@ -354,6 +354,8 @@ jobs:
       uses: actions/download-artifact@v7
       with:
         path: ./
+    - name: Validate downloaded build artifacts
+      run: scripts/ci/validate-downloaded-package-artifacts.sh "${{ github.sha }}"
     - name: Check packages using Packages.bz2
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
@@ -421,6 +423,8 @@ jobs:
       uses: actions/download-artifact@v7
       with:
         path: ./
+    - name: Validate downloaded build artifacts
+      run: scripts/ci/validate-downloaded-package-artifacts.sh "${{ github.sha }}"
     - name: Upload to packages.termux.dev
       env:
         REPOSITORY_URL: https://packages.termux.dev/aptly-api
