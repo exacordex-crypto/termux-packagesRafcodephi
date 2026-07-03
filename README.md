@@ -20,7 +20,7 @@ Android application.
 ## CI build artifacts
 
 The `Packages` workflow builds Termux package archives for `aarch64`, `arm`, `i686`, and `x86_64`.
-Generated `.deb` files are collected into per-architecture `debs-<arch>-<commit>.tar` artifacts, while matching checksum files are uploaded separately.
+Generated `.deb` files are collected by `scripts/ci/collect-package-artifacts.sh` into per-architecture `debs-<arch>-<commit>.tar` artifacts, while matching checksum files are uploaded separately.
 The repository does not build the Termux Android APK itself; APK signing and unsigned APK validation belong to the separate `termux-app` project.
 
 Quick how-to about Termux package management is available at [Package Management](https://github.com/termux/termux-packages/wiki/Package-Management). It also has info on how to fix **`repository is under maintenance or down`** errors when running `apt` or `pkg` commands.
